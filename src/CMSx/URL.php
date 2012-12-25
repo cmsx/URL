@@ -16,15 +16,8 @@ class URL
    */
   function __construct($url = null, $_ = null)
   {
-    $args = func_get_args();
-    foreach ($args as $u) {
-      if (is_array($u)) {
-        $this->addParameters($u);
-      } else {
-        list($a, $p) = static::Parse($u);
-        $this->addArguments($a);
-        $this->addParameters($p);
-      }
+    if (!is_null($url)) {
+      call_user_func_array(array($this, 'load'), func_get_args());
     }
   }
 
@@ -43,6 +36,26 @@ class URL
   public function toHTML($text = null, $attr = null, $target = null)
   {
     return HTML::A($this->toString(), $text, $attr, $target);
+  }
+
+  /** Загрузка и парсинг URLа в объект. Если URL не указан - используется текущий */
+  public function load($url = null, $_ = null)
+  {
+    if (is_null($url)) {
+      return $this->load($_SERVER['REQUEST_URI']);
+    }
+
+    foreach (func_get_args() as $u) {
+      if (is_array($u)) {
+        $this->addParameters($u);
+      } else {
+        list($a, $p) = static::Parse($u);
+        $this->addArguments($a);
+        $this->addParameters($p);
+      }
+    }
+
+    return $this;
   }
 
   /** Удаление текущих аргументов. Если передан $array - будут загружены новые */
@@ -233,7 +246,7 @@ class URL
 
     //Если открыта главная страница - URL пуст
     if (empty ($string) || $string == '/') {
-      return array(null, null);
+      return array($arguments, $params);
     }
 
     //Если указаны доп.параметры - отсекаем и не учитываем при разборе
