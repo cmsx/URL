@@ -28,6 +28,75 @@ class URL
     }
   }
 
+  function __toString()
+  {
+    return $this->toString();
+  }
+
+  /** Построение адреса */
+  public function toString()
+  {
+    return static::Build($this->arguments, $this->parameters);
+  }
+
+  /** Формирование HTML ссылки */
+  public function toHTML($text = null, $attr = null, $target = null)
+  {
+    return HTML::A($this->toString(), $text, $attr, $target);
+  }
+
+  /** Удаление текущих аргументов. Если передан $array - будут загружены новые */
+  public function cleanArguments(array $array = null)
+  {
+    $this->arguments = array();
+
+    if (is_array($array)) {
+      foreach ($array as $str) {
+        $this->addArgument($str);
+      }
+    }
+
+    return $this;
+  }
+
+  /** Удаление текущих параметров. Если передан $array - будут загружены новые */
+  public function cleanParameters(array $array = null)
+  {
+    $this->parameters = array();
+
+    if (is_array($array)) {
+      foreach ($array as $name => $val) {
+        $this->addParameter($name, $val);
+      }
+    }
+
+    return $this;
+  }
+
+  /** Задать значение аргумента. Если $value = null аргумент будет удален. */
+  public function setArgument($num, $value = null)
+  {
+    if (is_null($value)) {
+      unset($this->arguments[$num]);
+    } else {
+      $this->arguments[$num] = $value;
+    }
+
+    return $this;
+  }
+
+  /** Задать значение параметра. Если $value = null параметр будет удален. */
+  public function setParameter($name, $value = null)
+  {
+    if (is_null($value)) {
+      unset($this->parameters[$name]);
+    } else {
+      $this->parameters[$name] = $value;
+    }
+
+    return $this;
+  }
+
   /** Добавление аргумента */
   public function addArgument($arg)
   {
@@ -106,6 +175,55 @@ class URL
   }
 
   /**
+   * Получение параметра из URL
+   * $name - имя параметра
+   * $filter - callable или регулярное выражение
+   * $default - значение по-умолчанию
+   */
+  public function getParameter($name, $filter = null, $default = false)
+  {
+    if (!$this->hasParameter($name)) {
+      return $default;
+    }
+
+    if ($filter) {
+      if (is_callable($filter)) {
+        if (!call_user_func_array($filter, array($this->parameters[$name]))) {
+          return $default;
+        }
+      } else {
+        if (!preg_match($filter, $this->parameters[$name])) {
+          return $default;
+        }
+      }
+    }
+
+    return $this->parameters[$name];
+  }
+
+  /** Проверка, есть ли параметр */
+  public function hasParameter($name)
+  {
+    return isset($this->parameters[$name]);
+  }
+
+  /** Проверка есть ли аргумент. Нумерация с 1 */
+  public function hasArgument($num)
+  {
+    return isset($this->arguments[$num]);
+  }
+
+  /**
+   * Получение аргумента из URL
+   * $num - номер начиная с 1
+   * $default - значение по-умолчанию
+   */
+  public function getArgument($num, $default = false)
+  {
+    return $this->hasArgument($num) ? $this->arguments[$num] : $default;
+  }
+
+  /**
    * Разбор URL на части
    * Возвращает массив [аргументы, параметры]
    */
@@ -148,5 +266,41 @@ class URL
     }
 
     return array($arguments, $params);
+  }
+
+  /**
+   * Построение URL из аргументов и параметров
+   */
+  public static function Build(array $args = null, array $params = null)
+  {
+    $url     = '/';
+    $endings = array();
+    if (is_array($args)) {
+      foreach ($args as $str) {
+        if (0 === strpos($str, '#')) {
+          $endings[1] = $str;
+        } elseif (false !== strpos($str, '.')) {
+          $endings[0] = $str;
+        } else {
+          $url .= $str . '/';
+        }
+      }
+    }
+
+    if (is_array($params)) {
+      foreach ($params as $name => $val) {
+        if (is_array($val)) {
+          foreach ($val as $v) {
+            $url .= $name . ':' . $v . '/';
+          }
+        } else {
+          $url .= $name . ':' . $val . '/';
+        }
+      }
+    }
+
+    ksort($endings);
+
+    return $url . join('', $endings);
   }
 }

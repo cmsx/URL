@@ -24,12 +24,12 @@ class ParseTest extends PHPUnit_Framework_TestCase
     $act = URL::Parse('/русский/язык/');
     $this->assertEquals($exp, $act, 'Русский язык в URL');
 
-    $exp = array(array(1 => 'test', 'me', '#some'), array());
-    $act = URL::Parse('/test/me/#some');
+    $exp = array(array(1 => 'test', '#some'), array('one' => 'two'));
+    $act = URL::Parse('/test/one:two/#some');
     $this->assertEquals($exp, $act, 'URL с #анкором');
 
-    $exp = array(array(1 => 'test', 'me', 'file.txt'), array());
-    $act = URL::Parse('/test/me/file.txt');
+    $exp = array(array(1 => 'test', 'file.txt'), array('one' => 'two'));
+    $act = URL::Parse('/test/one:two/file.txt');
     $this->assertEquals($exp, $act, 'URL с файлом и расширением');
   }
 
