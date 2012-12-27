@@ -2,8 +2,6 @@
 
 namespace CMSx;
 
-use CMSx\HTML;
-
 class URL
 {
   protected $arguments = array();
@@ -42,7 +40,7 @@ class URL
   public function load($url = null, $_ = null)
   {
     if (is_null($url)) {
-      return $this->load($_SERVER['REQUEST_URI']);
+      return $this->load(isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '');
     }
 
     foreach (func_get_args() as $u) {

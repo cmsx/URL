@@ -94,6 +94,11 @@ class ParseTest extends PHPUnit_Framework_TestCase
 
   function testLoad()
   {
+    //При запуске не из браузера $_SERVER['REQUEST_URI'] не существует
+    $u = new URL;
+    $u->load();
+    $this->assertFalse($u->getArgument(1), 'Без REQUEST_URI пустой load = главная страница');
+
     $exp = array(1 => 'one', 'two', 'three');
 
     $u = new URL;
