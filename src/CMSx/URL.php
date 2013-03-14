@@ -234,6 +234,30 @@ class URL
     return $this->hasArgument($num) ? $this->arguments[$num] : $default;
   }
 
+  /** Быстрый доступ к параметру ID */
+  public function getId($default = null)
+  {
+    return $this->getParameter(
+      'id',
+      function($val) {
+        return is_numeric($val) && $val > 0;
+      },
+      $default
+    );
+  }
+
+  /** Быстрый доступ к параметру Page */
+  public function getPage($total_pages = null)
+  {
+    return $this->getParameter(
+      'page',
+      function($val) use ($total_pages) {
+        return $val >= 1 && (!$total_pages || $val <= $total_pages);
+      },
+      1
+    );
+  }
+
   /**
    * Разбор URL на части
    * Возвращает массив [аргументы, параметры]

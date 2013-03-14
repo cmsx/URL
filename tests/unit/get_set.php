@@ -90,6 +90,33 @@ class GetTest extends PHPUnit_Framework_TestCase
     $this->assertTrue($exp === $u->getParameter('one', $filter, $default), $msg);
   }
 
+  function testGetId()
+  {
+    $u = new URL('/hello/id:abc/');
+    $this->assertEmpty($u->getId(), 'ID проверяется на is_numeric');
+
+    $u = new URL('/hello/id:-123/');
+    $this->assertEmpty($u->getId(), 'ID должен быть больше нуля');
+
+    $u = new URL('/hello/id:123/');
+    $this->assertEquals(123, $u->getId(), 'Корректный ID');
+  }
+
+  function testGetPage()
+  {
+    $u = new URL('/');
+    $this->assertEquals(1, $u->getPage(), 'Страница не указана явно');
+
+    $u = new URL('/page:0/');
+    $this->assertEquals(1, $u->getPage(), 'Номер страницы должен быть больше 1');
+
+    $u = new URL('/page:10/');
+    $this->assertEquals(1, $u->getPage(5), 'Номер страницы должен не больше общего числа страниц');
+
+    $u = new URL('/page:10/');
+    $this->assertEquals(10, $u->getPage(), 'Номер страницы из URL');
+  }
+
   function dataParams()
   {
     // $value, $exp, $msg, $filter = null, $default = false
