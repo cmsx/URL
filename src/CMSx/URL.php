@@ -315,9 +315,9 @@ class URL
         if (0 === strpos($str, '#')) {
           $endings[1] = $str;
         } elseif (false !== strpos($str, '.')) {
-          $endings[0] = $str;
+          $endings[0] = urlencode($str);
         } else {
-          $url .= $str . '/';
+          $url .= urlencode($str) . '/';
         }
       }
     }
@@ -326,10 +326,10 @@ class URL
       foreach ($params as $name => $val) {
         if (is_array($val)) {
           foreach ($val as $v) {
-            $url .= $name . ':' . $v . '/';
+            $url .= urlencode($name) . ':' . urlencode($v) . '/';
           }
         } else {
-          $url .= $name . ':' . $val . '/';
+          $url .= urlencode($name) . ':' . urlencode($val) . '/';
         }
       }
     }

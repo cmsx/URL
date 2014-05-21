@@ -44,6 +44,13 @@ class BuildTest extends PHPUnit_Framework_TestCase
       ),
 
       array(
+        array('ололо'),
+        array('ой' => 'пыщпыщ', 'где' => array('дом', 'работа')),
+        '/%D0%BE%D0%BB%D0%BE%D0%BB%D0%BE/%D0%BE%D0%B9:%D0%BF%D1%8B%D1%89%D0%BF%D1%8B%D1%89/%D0%B3%D0%B4%D0%B5:%D0%B4%D0%BE%D0%BC/%D0%B3%D0%B4%D0%B5:%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0/',
+        'Русский язык в URL'
+      ),
+
+      array(
         array('test', 'me'),
         array('id' => array(12, 15, 16), 'hello' => 'world'),
         '/test/me/id:12/id:15/id:16/hello:world/',
